@@ -7,6 +7,7 @@ then
     echo 'Please execute script with root privileges.'
     exit 1
 fi
+
 # Prompts for username
 read -p 'Enter username: ' USER_NAME
 
@@ -18,10 +19,6 @@ read -p 'Enter intial password: ' PASSWORD
 
 # Creates the user account
 useradd -c "${REAL_NAME}" -m ${USER_NAME}
-echo ${PASSWORD} | passwd --stdin ${USER_NAME}
-
-# Force password change on first login
-passwd -e ${USER_NAME}
 
 # Informs if account was not created
 if [[ "${?}" -ne 0 ]] 
@@ -30,10 +27,26 @@ then
     exit 1
 fi
 
+# Create password for the user
+echo ${PASSWORD} | passwd --stdin ${USER_NAME}
+
+# Informs if the password was not created
+if [[ "${?}" -ne 0 ]]
+then
+    echo "Mission Failed."
+    exit 1
+fi
+
+# Force password change on first login
+passwd -e ${USER_NAME}
+
 # Displays username, password, and host
 HOST_NAME=$(hostname)
-echo "USERNAME: ${USER_NAME}"
-echo "REAL NAME: ${REAL_NAME}"
-echo "HOST NAME: ${HOST_NAME}"
+echo
+echo "Username: ${USER_NAME}"
+echo
+echo "Real name: ${REAL_NAME}"
+echo
+echo "Host: ${HOST_NAME}"
 
 exit 0
